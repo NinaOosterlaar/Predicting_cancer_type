@@ -1,0 +1,7 @@
+Can we predict the cancer type from the cancer genome?
+
+TGCT = testicular
+BRCA = breast
+LUNG = lung
+SKCM = melanoma
+LIHC = liver
