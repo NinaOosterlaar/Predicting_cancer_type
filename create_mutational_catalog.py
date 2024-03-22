@@ -1,4 +1,14 @@
-def load_data(filename):
+# Description: This script creates a mutational catalog for a given cancer type and saves it to an output file.
+
+def load_data(filename: str):
+    """Loads the data from the chosen cancer.
+
+    Args:
+        filename (str): Filename of the raw cancer data.
+    
+    Returns:
+        genomes: Dictionary of lists of mutations.
+    """
     with open(filename, "r") as file:
         data = file.readlines()
         genomes = {}
@@ -14,7 +24,15 @@ def load_data(filename):
     return genomes
 
 
-def create_catalog(genomes):
+def create_catalog(genomes: dict):
+    """Creates a catalog of the mutations for each genome.
+    
+    Args:
+        genomes (dict): Dictionary of lists of mutations.
+    
+    Returns:
+        catalogs (dict): Dictionary of dictionaries of mutations for each cancer patient.
+    """
     catalogs = {}
     for genome in genomes:
         catalog = {"A->C": 0, "A->G": 0, "A->T": 0, "C->A": 0, "C->G": 0, "C->T": 0, "G->A": 0, "G->C": 0, "G->T": 0, "T->A": 0, "T->C": 0, "T->G": 0}
@@ -24,7 +42,13 @@ def create_catalog(genomes):
     return catalogs
 
 
-def write_catalogs(catalogs, filename):
+def write_catalogs(catalogs: dict, filename: str):
+    """Writes the catalogs to a file.
+
+    Args:
+        catalogs (dict): Dictionary of dictionaries of mutations for each cancer patient.
+        filename (str): Filename of the output file.
+    """
     with open(filename, "w") as file:
         for genome in catalogs:
             file.write(genome + "\n")
