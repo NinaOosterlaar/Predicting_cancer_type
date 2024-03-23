@@ -8,7 +8,7 @@ from sklearn.exceptions import DataConversionWarning
 BREAST = True
 LUNG = True
 TESTICULAR = False
-MELANOMA = False
+MELANOMA = True
 LIVER = False
 
 
@@ -22,11 +22,25 @@ def parameters_grid():
     return {"C": C, "solver": solver, "tol": tol, "penalty": penalty, "class_weight": class_weight}
 
 
-def logistic_regression():
+def parameters_grid_multiclass():
+    """Defines the parameters for the grid search for the multiclass case."""
+    multiclass = ["ovr", "multinomial"]
+    C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+    solver = ["newton-cg", "lbfgs", "liblinear", "sag", "saga", "newton-cholesky"]
+    penalty = ["l1", "l2", "elasticnet", None]
+    class_weight = ["balanced", None]
+    tol = [1e-4, 1e-3, 1e-2]
+    return {"multi_class": multiclass, "C": C, "solver": solver, "penalty": penalty, "class_weight": class_weight, "tol": tol}
+
+
+def logistic_regression(multiclass: bool = False):
     """Performs a grid search for the logistic regression classifier."""
     X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
     clf = LogisticRegression(max_iter=5000)
-    parameters = parameters_grid()
+    if multiclass:
+        parameters = parameters_grid_multiclass()
+    else:
+        parameters = parameters_grid()
     grid = GridSearchCV(clf, parameters, cv=StratifiedKFold(n_splits=5))
     grid.fit(X, y)
     print("Logistic Regression")
@@ -50,7 +64,7 @@ def save_best_parameters(filename: str, best_params: dict, best_score: float):
     
     
 if __name__ == "__main__":
-    param, score = logistic_regression()
+    param, score = logistic_regression(True)
     save_best_parameters("Hyperparameters/logistic_regression.txt", param, score)
                     
 
