@@ -1,3 +1,5 @@
+# Description: This file contains the code for the classifiers used in the project, this is more of a template to begin with.
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
