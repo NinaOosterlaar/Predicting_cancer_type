@@ -1,0 +1,16 @@
+Breast cancer Lung cancer Logistic Regression
+Best parameters: {'shrinkage': 'auto', 'solver': 'lsqr', 'tol': 0.0001}
+Best score: 0.8189752305416548
+
+Breast cancer Melanoma Logistic Regression
+Best parameters: {'shrinkage': None, 'solver': 'svd', 'tol': 0.0001}
+Best score: 0.746259406817176
+
+Lung cancer Melanoma Logistic Regression
+Best parameters: {'shrinkage': 'auto', 'solver': 'lsqr', 'tol': 0.0001}
+Best score: 0.8259332485995386
+
+Breast cancer Lung cancer Melanoma Logistic Regression
+Best parameters: {'shrinkage': 'auto', 'solver': 'lsqr', 'tol': 0.0001}
+Best score: 0.7257777777777779
+

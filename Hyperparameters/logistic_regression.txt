@@ -7,3 +7,6 @@ Best score: 0.9323942325934358
 Lung cancer Melanoma 
 Best parameters: {'C': 0.01, 'class_weight': 'balanced', 'penalty': 'l1', 'solver': 'liblinear', 'tol': 0.01}
 Best score: 0.9479193145977499
+Breast cancer Lung cancer Melanoma 
+Best parameters: {'C': 0.01, 'class_weight': 'balanced', 'multi_class': 'ovr', 'penalty': 'l2', 'solver': 'liblinear', 'tol': 0.001}
+Best score: 0.8657777777777778

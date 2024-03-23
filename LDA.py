@@ -8,7 +8,7 @@ from sklearn.exceptions import DataConversionWarning
 BREAST = True
 LUNG = True
 TESTICULAR = False
-MELANOMA = False
+MELANOMA = True
 LIVER = False
 
 
