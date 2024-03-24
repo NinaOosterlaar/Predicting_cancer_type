@@ -1,4 +1,4 @@
-from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from create_data import choose_cancers
 import warnings
@@ -11,27 +11,28 @@ TESTICULAR = False
 MELANOMA = False
 LIVER = False
 
+
 def parameters_grid():
     """Defines the parameters for the grid search."""
-    C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-    kernel = ["linear", "poly", "rbf", "sigmoid"]
-    degree = [2, 3, 4, 5]
-    gamma = ["scale", "auto"]
-    coef0 = [0.0, 0.1, 0.5, 1.0]
-    shrinking = [True, False]
-    class_weight = ["balanced", None]
-    tol = [1e-4, 1e-3, 1e-2]
-    return {"C": C, "kernel": kernel, "degree": degree, "gamma": gamma, "coef0": coef0, "tol": tol, "shrinking": shrinking, "class_weight": class_weight}
+    n_estimators = [10, 50, 100, 200, 500, 1000, 2000]
+    criterion = ["gini", "entropy", "log_loss"]
+    max_depth = [None, 10, 20, 30, 40, 50]
+    min_samples_split = [2, 5, 10, 15]
+    min_samples_leaf = [1, 2, 4, 8]
+    max_features = [None, "sqrt", "log2"]
+    max_leaf_nodes = [None, 10, 20, 30, 40, 50]
+    bootstrap = [True, False]
+    return {"n_estimators": n_estimators, "criterion": criterion, "max_depth": max_depth, "min_samples_split": min_samples_split, "min_samples_leaf": min_samples_leaf, "max_features": max_features, "max_leaf_nodes": max_leaf_nodes, "bootstrap": bootstrap}
 
 
-def support_vector_machine(multiclass: bool = False):
-    """Performs a grid search for the support vector machine classifier."""
+def random_forest():
+    """Performs a grid search for the random forest classifier."""
     X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
-    clf = SVC()
+    clf = RandomForestClassifier()
     parameters = parameters_grid()
-    grid = GridSearchCV(clf, parameters, cv=StratifiedKFold(n_splits=5))
+    grid = GridSearchCV(clf, parameters, cv=StratifiedKFold(n_splits=5), verbose=3)
     grid.fit(X, y)
-    print("Support Vector Machine")
+    print("Random Forest Classifier")
     print("Best parameters: ", grid.best_params_)
     print("Best score: ", grid.best_score_)
     return grid.best_params_, grid.best_score_
@@ -46,11 +47,11 @@ def save_best_parameters(filename: str, best_params: dict, best_score: float):
             file.write("Lung cancer ")
         if MELANOMA:
             file.write("Melanoma ")
-        file.write("Support Vector Machine\n")
+        file.write("Random Forest Classifier\n")
         file.write("Best parameters: " + str(best_params) + "\n")
         file.write("Best score: " + str(best_score) + "\n\n")
-    
-    
+        
+        
 if __name__ == "__main__":
-    param, score = support_vector_machine()
-    save_best_parameters("Hyperparameters/svm.txt", param, score)
+    param, score = random_forest()
+    save_best_parameters("Hyperparameters/random_forest.txt", param, score)

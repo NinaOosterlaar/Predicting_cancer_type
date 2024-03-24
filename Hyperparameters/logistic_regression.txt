@@ -1,5 +1,5 @@
 Breast cancer Lung cancer 
-Best parameters: {'C': 0.001, 'class_weight': 'balanced', 'penalty': None, 'solver': 'newton-cg', 'tol': 0.0001}
+Best parameters: {'class_weight': 'balanced', 'penalty': None, 'solver': 'newton-cg', 'tol': 0.0001}
 Best score: 0.883995845529223
 Breast cancer Melanoma 
 Best parameters: {'C': 0.01, 'class_weight': None, 'penalty': 'l2', 'solver': 'newton-cg', 'tol': 0.0001}
