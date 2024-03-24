@@ -1,5 +1,14 @@
+# Description: This file contains functions to read the best parameters of a classifier from a file.
+
 def retrieve_parameters(filename: str, BREAST: bool, LUNG: bool, MELANOMA: bool):
-    """Retrieves the best parameters and the best score from a file."""
+    """Retrieves the best parameters and the best score from a file.
+    
+    Args:
+        filename (str): Filename of the file.
+        BREAST (bool): Include breast cancer.
+        LUNG (bool): Include lung cancer.
+        MELANOMA (bool): Include melanoma.
+    """
     with open(filename, "r") as file:
         lines = file.readlines()
     if BREAST and LUNG and MELANOMA:
@@ -25,6 +34,15 @@ def retrieve_parameters(filename: str, BREAST: bool, LUNG: bool, MELANOMA: bool)
   
             
 def preprocess_parameters(parameters_string):
+    """Preprocesses the parameters string. 
+    Turn the string into a usable dictionary.
+
+    Args:
+        parameters_string (str): String of best parameters.
+
+    Returns:
+        parameters (dict): 
+    """
     parameters = {}
     for i in range(0, len(parameters_string), 2):
         parameters_string[i] = parameters_string[i].replace(":", "")
@@ -46,6 +64,14 @@ def preprocess_parameters(parameters_string):
     
     
 def is_float(element: any):
+    """Check if the element is a float.
+
+    Args:
+        element (any): Element to check.
+
+    Returns:
+        (bool): True if the element is a float, False otherwise.
+    """
     try:
         float(element)
         return True

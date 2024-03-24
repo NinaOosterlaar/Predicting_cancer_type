@@ -1,3 +1,5 @@
+# Description: This script performs a grid search for the support vector machine classifier.
+
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from create_data import choose_cancers
@@ -12,7 +14,11 @@ MELANOMA = False
 LIVER = False
 
 def parameters_grid():
-    """Defines the parameters for the grid search."""
+    """Defines the parameters for the grid search.
+    
+    Returns: 
+        parameters (dict): Dictionary with the parameters.
+    """
     C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
     kernel = ["linear", "rbf", "sigmoid", "poly"]
     degree = [2, 3, 4, 5]
@@ -25,7 +31,13 @@ def parameters_grid():
 
 
 def support_vector_machine():
-    """Performs a grid search for the support vector machine classifier."""
+    """Performs a grid search for the support vector machine classifier.
+    prints the best parameters and the best score.
+    
+    Returns:
+        grid.best_params_ (dict): Best parameters.
+        grid.best_score_ (float): Best score.
+    """
     X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
     clf = SVC()
     parameters = parameters_grid()
@@ -38,7 +50,13 @@ def support_vector_machine():
 
 
 def save_best_parameters(filename: str, best_params: dict, best_score: float):
-    """Saves the best parameters and the best score to a file."""
+    """Saves the best parameters and the best score to a file.
+    
+    Args:
+        filename (str): Filename of the output file.
+        best_params (dict): Best parameters.
+        best_score (float): Best score.
+    """
     with open(filename, "a") as file:
         if BREAST:
             file.write("Breast cancer ")
