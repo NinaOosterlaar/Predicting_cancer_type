@@ -14,15 +14,13 @@ LIVER = False
 
 def parameters_grid():
     """Defines the parameters for the grid search."""
-    n_estimators = [10, 50, 100, 200, 500, 1000, 2000]
+    n_estimators = [50, 100, 200, 500]
     criterion = ["gini", "entropy", "log_loss"]
-    max_depth = [None, 10, 20, 30, 40, 50]
+    max_depth = [None, 10, 20, 30]
     min_samples_split = [2, 5, 10, 15]
     min_samples_leaf = [1, 2, 4, 8]
-    max_features = [None, "sqrt", "log2"]
-    max_leaf_nodes = [None, 10, 20, 30, 40, 50]
     bootstrap = [True, False]
-    return {"n_estimators": n_estimators, "criterion": criterion, "max_depth": max_depth, "min_samples_split": min_samples_split, "min_samples_leaf": min_samples_leaf, "max_features": max_features, "max_leaf_nodes": max_leaf_nodes, "bootstrap": bootstrap}
+    return {"n_estimators": n_estimators, "criterion": criterion, "max_depth": max_depth, "min_samples_split": min_samples_split, "min_samples_leaf": min_samples_leaf, "bootstrap": bootstrap}
 
 
 def random_forest():

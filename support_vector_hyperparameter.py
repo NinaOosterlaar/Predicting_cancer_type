@@ -5,13 +5,22 @@ from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from create_data import choose_cancers
 import warnings
 from sklearn.exceptions import DataConversionWarning
+import argparse
 # warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 
-BREAST = True
-LUNG = True
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--breast", help="Include breast cancer data", action="store_true")
+parser.add_argument("--lung", help="Include lung cancer data", action="store_true")
+parser.add_argument("--melanoma", help="Include testicular cancer data", action="store_true")
+args = parser.parse_args()
+
+BREAST = args.breast
+LUNG = args.lung
 TESTICULAR = False
-MELANOMA = False
+MELANOMA = args.melanoma
 LIVER = False
+
 
 def parameters_grid():
     """Defines the parameters for the grid search.
@@ -20,7 +29,7 @@ def parameters_grid():
         parameters (dict): Dictionary with the parameters.
     """
     C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
-    kernel = ["linear", "rbf", "sigmoid", "poly"]
+    kernel = ["linear"]
     degree = [2, 3, 4, 5]
     gamma = ["scale", "auto"]
     coef0 = [0.0, 0.1, 0.5, 1.0]
@@ -70,5 +79,6 @@ def save_best_parameters(filename: str, best_params: dict, best_score: float):
     
     
 if __name__ == "__main__":
-    param, score = support_vector_machine()
-    save_best_parameters("Hyperparameters/svm.txt", param, score)
+    # param, score = support_vector_machine()
+    # save_best_parameters("Hyperparameters/svm.txt", param, score)
+    pass

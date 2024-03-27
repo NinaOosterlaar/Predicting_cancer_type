@@ -5,6 +5,7 @@ from sklearn.model_selection import cross_validate
 from create_data import choose_cancers 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from read_parameters import retrieve_parameters, preprocess_parameters
+from sklearn.metrics import classification_report
 
 BREAST = False
 LUNG = True
@@ -48,15 +49,50 @@ def get_parameters(filename: str):
 
 def evaluate(clf, X, y):
     if len(set(y)) > 2:
-        score = ["accuracy", "roc_auc_ovr", "precision_macro", "recall_macro", "f1_macro"]
+        score = ["accuracy", "roc_auc_ovr"]
     else:
-        score = ["accuracy", "roc_auc", "precision", "recall", "f1"]
-    values = cross_validate(clf, X, y, scoring=score, cv=5)
+        score = ["accuracy", "roc_auc"]
+    values = cross_validate(clf, X, y, scoring=score, cv=5, return_estimator=True)
+    reports = []
+    for estimator in values['estimator']:
+        y_pred = estimator.predict(X)
+        report = classification_report(y, y_pred, output_dict=True)
+        reports.append(report)
+    return values, reports
+
+
+def manage_scores(values, reports):
     scores = {}
-    for key, value in values.items():
-        scores[key] = (value.mean(), value.std())
+    for key in values.keys():
+        if key != "estimator":
+            scores[key] = values[key].mean()
+    labels = conversion_labels()
+    for report in reports:
+        for key in report.keys():
+            if key in labels:
+                if labels[key] not in scores:
+                    scores[labels[key]] = {}
+                for metric in report[key].keys():
+                    if metric not in scores[labels[key]]:
+                        scores[labels[key]][metric] = 0
+                    scores[labels[key]][metric] += report[key][metric]
+    for key in scores.keys():
+        if type(scores[key]) == dict:
+            for metric in scores[key].keys():
+                scores[key][metric] /= len(reports)
     return scores
 
+
+def conversion_labels():
+    if BREAST and LUNG and MELANOMA:
+        return {"0": "Breast cancer", "1": "Lung cancer", "2": "Melanoma"}
+    elif BREAST and LUNG:
+        return {"0": "Breast cancer", "1": "Lung cancer"}
+    elif BREAST and MELANOMA:
+        return {"0": "Breast cancer", "1": "Melanoma"}
+    else:
+        return {"0": "Lung cancer", "1": "Melanoma"}
+    
 
 def save_scores(scores, filename, model):
     with open(filename, "a") as f:
@@ -73,6 +109,7 @@ def save_scores(scores, filename, model):
 
 
 if __name__ == "__main__":
-    parameters = get_parameters("Hyperparameters/LDA.txt")
-    scores = linear_discriminant_analysis(parameters)
-    save_scores(scores, "Score/score.txt", "LDA")
+    parameters = get_parameters("Hyperparameters/logistic_regression.txt")
+    values, reports = logistic_regression(parameters)
+    scores = manage_scores(values, reports)
+    save_scores(scores, "Score/score_logistic.txt", "Logistic Regression")
