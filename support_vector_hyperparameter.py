@@ -5,20 +5,14 @@ from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from create_data import choose_cancers
 import warnings
 from sklearn.exceptions import DataConversionWarning
-import argparse
 # warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--breast", help="Include breast cancer data", action="store_true")
-parser.add_argument("--lung", help="Include lung cancer data", action="store_true")
-parser.add_argument("--melanoma", help="Include testicular cancer data", action="store_true")
-args = parser.parse_args()
 
-BREAST = args.breast
-LUNG = args.lung
+BREAST = True
+LUNG = True
 TESTICULAR = False
-MELANOMA = args.melanoma
+MELANOMA = False
 LIVER = False
 
 
@@ -28,15 +22,14 @@ def parameters_grid():
     Returns: 
         parameters (dict): Dictionary with the parameters.
     """
-    C = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+    C = [0.001, 0.01, 0.1, 1, 10, 100]
     kernel = ["linear"]
-    degree = [2, 3, 4, 5]
     gamma = ["scale", "auto"]
     coef0 = [0.0, 0.1, 0.5, 1.0]
     shrinking = [True, False]
     class_weight = ["balanced", None]
     tol = [1e-4, 1e-3, 1e-2]
-    return {"C": C, "kernel": kernel, "degree": degree, "gamma": gamma, "coef0": coef0, "tol": tol, "shrinking": shrinking, "class_weight": class_weight}
+    return {"C": C, "kernel": kernel, "gamma": gamma, "coef0": coef0, "tol": tol, "shrinking": shrinking, "class_weight": class_weight}
 
 
 def support_vector_machine():
@@ -79,6 +72,5 @@ def save_best_parameters(filename: str, best_params: dict, best_score: float):
     
     
 if __name__ == "__main__":
-    # param, score = support_vector_machine()
-    # save_best_parameters("Hyperparameters/svm.txt", param, score)
-    pass
+    param, score = support_vector_machine()
+    save_best_parameters("Hyperparameters/svm.txt", param, score)
