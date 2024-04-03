@@ -7,41 +7,37 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from read_parameters import retrieve_parameters, preprocess_parameters
 from sklearn.metrics import classification_report
 
-BREAST = False
-LUNG = True
-TESTICULAR = False
-MELANOMA = True
-LIVER = False 
 
-def random_forest(parameters):
-    X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
+
+def random_forest(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
+    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
     clf = RandomForestClassifier(**parameters)
     scores = evaluate(clf, X, y)
     return scores
     
 
-def logistic_regression(parameters):
-    X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
+def logistic_regression(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
+    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
     clf = LogisticRegression(max_iter=5000, **parameters)
     scores = evaluate(clf, X, y)
     return scores
     
 
-def support_vector_machine(parameters):
-    X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
-    clf = SVC(**parameters)
+def support_vector_machine(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
+    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
+    clf = SVC(**parameters, probability=True)
     scores = evaluate(clf, X, y)
     return scores
     
     
-def linear_discriminant_analysis(parameters):
-    X, y = choose_cancers(BREAST, LUNG, TESTICULAR, MELANOMA, LIVER)
+def linear_discriminant_analysis(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
+    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
     clf = LinearDiscriminantAnalysis(**parameters)
     scores = evaluate(clf, X, y)
     return scores
     
     
-def get_parameters(filename: str):
+def get_parameters(filename: str, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
     parameters = retrieve_parameters(filename, BREAST, LUNG, MELANOMA)
     parameters = preprocess_parameters(parameters)
     return parameters
@@ -52,19 +48,24 @@ def evaluate(clf, X, y):
         score = ["accuracy", "roc_auc_ovr"]
     else:
         score = ["accuracy", "roc_auc"]
-    values = cross_validate(clf, X, y, scoring=score, cv=5, return_estimator=True)
+    values = cross_validate(clf, X, y, scoring=score, cv=5, return_estimator=True, return_indices=True)
     reports = []
-    for estimator in values['estimator']:
-        y_pred = estimator.predict(X)
-        report = classification_report(y, y_pred, output_dict=True)
+    coef = []
+    for c, estimator in enumerate(values['estimator']):
+        x_test = [X[i] for i in values['indices']['test'][c]]
+        y_test = [y[i] for i in values['indices']['test'][c]]
+        y_pred = estimator.predict(x_test)
+        report = classification_report(y_test, y_pred, output_dict=True)
         reports.append(report)
-    return values, reports
+        if hasattr(estimator, "coef_"):
+            coef.append(estimator.coef_)
+    return values, reports, coef
 
 
-def manage_scores(values, reports):
+def manage_scores(values, reports, coef):
     scores = {}
     for key in values.keys():
-        if key != "estimator":
+        if key != "estimator" and key != 'indices':
             scores[key] = values[key].mean()
     labels = conversion_labels()
     for report in reports:
@@ -83,7 +84,7 @@ def manage_scores(values, reports):
     return scores
 
 
-def conversion_labels():
+def conversion_labels(BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
     if BREAST and LUNG and MELANOMA:
         return {"0": "Breast cancer", "1": "Lung cancer", "2": "Melanoma"}
     elif BREAST and LUNG:
@@ -94,7 +95,7 @@ def conversion_labels():
         return {"0": "Lung cancer", "1": "Melanoma"}
     
 
-def save_scores(scores, filename, model):
+def save_scores(scores, filename, model, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
     with open(filename, "a") as f:
         f.write(model + "\n")
         if BREAST:
@@ -109,7 +110,10 @@ def save_scores(scores, filename, model):
 
 
 if __name__ == "__main__":
-    parameters = get_parameters("Hyperparameters/logistic_regression.txt")
-    values, reports = logistic_regression(parameters)
-    scores = manage_scores(values, reports)
-    save_scores(scores, "Score/score_logistic.txt", "Logistic Regression")
+    BREAST = True
+    LUNG = True
+    MELANOMA = False
+    parameters = get_parameters("Hyperparameters/LDA.txt", BREAST, LUNG, MELANOMA)
+    values, reports, coef = linear_discriminant_analysis(parameters, BREAST, LUNG, MELANOMA)
+    scores = manage_scores(values, reports, coef)
+    # save_scores(scores, "Results/score_LDA.txt", "LDA actual correct", BREAST, LUNG, MELANOMA)

@@ -1,4 +1,5 @@
 # Description: This script creates the dataset for the classification task.
+import numpy as np
 
 def retrieve_cancer(filename: str):
     """Retrieves the mutations from the chosen cancer.
@@ -43,8 +44,7 @@ def collect_cancers(filenames: list):
     return X, y
         
  
-def choose_cancers(breast: bool = True, lung: bool = True, testicular: bool = False,
-                    melanoma: bool = False, liver: bool = False):
+def choose_cancers(breast: bool = True, lung: bool = True, melanoma: bool = False):
     """Creates a dataset with the chosen cancers.
 
     Args:
@@ -63,12 +63,8 @@ def choose_cancers(breast: bool = True, lung: bool = True, testicular: bool = Fa
         filenames.append("Mutational_catalogs/BRCA_catalog_basic.txt")
     if lung:
         filenames.append("Mutational_catalogs/LUNG_catalog_basic.txt")
-    if testicular:
-        filenames.append("Mutational_catalogs/TGCT_catalog_basic.txt")
     if melanoma:
         filenames.append("Mutational_catalogs/SKCM_catalog_basic.txt")
-    if liver:
-        filenames.append("Mutational_catalogs/LIHC_catalog_basic.txt")
     
     X, y = collect_cancers(filenames)
     

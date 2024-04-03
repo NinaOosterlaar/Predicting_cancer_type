@@ -57,11 +57,31 @@ def preprocess_parameters(parameters_string):
         parameters_string[i+1] = parameters_string[i+1].replace("}", "")
         if is_float(parameters_string[i+1]):
             parameters_string[i+1] = float(parameters_string[i+1])
+            if is_integer(parameters_string[i+1]):
+                parameters_string[i+1] = int(parameters_string[i+1])
         if parameters_string[i+1] == "None":
             parameters_string[i+1] = None
+        if parameters_string[i+1] == "True":
+            parameters_string[i+1] = True
+        if parameters_string[i+1] == "False":
+            parameters_string[i+1] = False
         parameters[parameters_string[i]] = parameters_string[i + 1]
     return parameters
+   
     
+def is_integer(element: any):
+    """Check if the element is an integer.
+
+    Args:
+        element (any): Element to check.
+
+    Returns:
+        (bool): True if the element is an integer, False otherwise.
+    """
+    if abs(element - int(element)) == 0:
+            return True
+    else:
+        return False
     
 def is_float(element: any):
     """Check if the element is a float.
