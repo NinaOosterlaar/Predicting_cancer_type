@@ -9,29 +9,25 @@ from sklearn.metrics import classification_report
 
 
 
-def random_forest(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
-    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
+def random_forest(parameters, X, y):
     clf = RandomForestClassifier(**parameters)
     scores = evaluate(clf, X, y)
     return scores
     
 
-def logistic_regression(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
-    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
+def logistic_regression(parameters, X, y):
     clf = LogisticRegression(max_iter=5000, **parameters)
     scores = evaluate(clf, X, y)
     return scores
     
 
-def support_vector_machine(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
-    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
+def support_vector_machine(parameters, X, y):
     clf = SVC(**parameters, probability=True)
     scores = evaluate(clf, X, y)
     return scores
     
     
-def linear_discriminant_analysis(parameters, BREAST: bool = True, LUNG: bool = True, MELANOMA: bool = False):
-    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
+def linear_discriminant_analysis(parameters, X, y):
     clf = LinearDiscriminantAnalysis(**parameters)
     scores = evaluate(clf, X, y)
     return scores
@@ -112,8 +108,9 @@ def save_scores(scores, filename, model, BREAST: bool = True, LUNG: bool = True,
 if __name__ == "__main__":
     BREAST = True
     LUNG = True
-    MELANOMA = False
-    parameters = get_parameters("Hyperparameters/LDA.txt", BREAST, LUNG, MELANOMA)
-    values, reports, coef = linear_discriminant_analysis(parameters, BREAST, LUNG, MELANOMA)
+    MELANOMA = True
+    parameters = get_parameters("Hyperparameters/svm.txt", BREAST, LUNG, MELANOMA)
+    X, y = choose_cancers(BREAST, LUNG, MELANOMA)
+    values, reports, coef = support_vector_machine(parameters, X, y)
     scores = manage_scores(values, reports, coef)
-    # save_scores(scores, "Results/score_LDA.txt", "LDA actual correct", BREAST, LUNG, MELANOMA)
+    save_scores(scores, "Results/score_svm.txt", "svm trial", BREAST, LUNG, MELANOMA)

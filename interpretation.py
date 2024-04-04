@@ -3,6 +3,7 @@ import lime
 import lime.lime_tabular    
 import numpy as np
 from sklearn.inspection import permutation_importance
+from matplotlib import pyplot as plt
 
 BREAST = True
 LUNG = False
@@ -13,47 +14,48 @@ LIVER = False
 features = np.array(["A->C", "A->G", "A->T", "C->A", "C->G", "C->T", "G->A", "G->C", "G->T", "T->A", "T->C", "T->G"])
 
 def LIME(values, X, y):
+    feature_importance = {}  # Dictionary to store feature importance values
+
     for count in range(5):
-        model, x_train, y_train = process_data(values, X, y, count)
-        x_train = np.array(x_train)
-        explainer = lime.lime_tabular.LimeTabularExplainer(x_train, mode="classification", feature_names=features)
-        for i in range(10):
-            exp = explainer.explain_instance(x_train[i], model.predict_proba, num_features=5)
-            exp.show_in_notebook(show_table=True)
-            print("True class: ", y_train[i])
-            print("Predicted class: ", model.predict(x_train[i].reshape(1, -1)))
-            print("Feature Importance:")
+        model, x_test, y_test = process_data(values, X, y, count)
+        x_test = np.array(x_test)
+        explainer = lime.lime_tabular.LimeTabularExplainer(x_test, mode="classification", feature_names=features)
+        
+        for i in range(len(x_test)):
+            exp = explainer.explain_instance(x_test[i], model.predict_proba, num_features=12)
+            
+            # Accumulate feature importance values
             for feature, weight in exp.as_list():
-                print(f"{feature}: {weight}")
-            print("\n")
+                if feature not in feature_importance:
+                    feature_importance[feature] = []
+                feature_importance[feature].append(weight)
+    
+    # Compute average importance values for each feature
+    avg_importance = {feature: (np.mean(values), np.std(values), len(values)) for feature, values in feature_importance.items()}
+
+    return avg_importance
             
             
-def feature_permutation(values, X, y):
+def feature_permutation(values, X, y): 
     features_permutation = {}
     for i in range(5):
-        model, x_test, y_test = process_data(values, X, y, i, train = False)
+        model, x_test, y_test = process_data(values, X, y, i)
         permutations = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
 
         for j in permutations.importances_mean.argsort()[::-1]:
             if permutations.importances_mean[j] - 2 * permutations.importances_std[j] > 0:
                 if features[j] not in features_permutation:
-                    print(features[j])
                     features_permutation[features[j]] = []
                 features_permutation[features[j]].append((i, permutations.importances_mean[j], permutations.importances_std[j]))
     return features_permutation
 
     
     
-def process_data(values, X, y, count, train = True):
+def process_data(values, X, y, count):
     model = values['estimator'][count]
-    if train:
-        x_train = [X[i] for i in values['indices']['train'][count]]
-        y_train = [y[i] for i in values['indices']['train'][count]]
-        return model, x_train, y_train
-    else:
-        x_test = [X[i] for i in values['indices']['test'][count]]
-        y_test = [y[i] for i in values['indices']['test'][count]]
-        return model, x_test, y_test
+    x_test = [X[i] for i in values['indices']['test'][count]]
+    y_test = [y[i] for i in values['indices']['test'][count]]
+    return model, x_test, y_test
 
 
 def get_models(classifier, BREAST, LUNG, MELANOMA):
@@ -76,7 +78,7 @@ def get_models(classifier, BREAST, LUNG, MELANOMA):
     return values, reports, coef, filename
 
 
-def save_features(filename, features_permutation, coef, BREAST, LUNG, MELANOMA):
+def save_features(filename, features_permutation, features_lime, coef, BREAST, LUNG, MELANOMA):
     with open(filename, "a") as f:
         if BREAST:
             f.write("Breast cancer ")
@@ -96,6 +98,12 @@ def save_features(filename, features_permutation, coef, BREAST, LUNG, MELANOMA):
             for value in features_permutation[feature]:
                 f.write(str(value) + "\n")
             f.write("\n")
+        f.write("LIME: \n")
+        for feature in features_lime:
+            f.write(feature + ": ")
+            for value in features_lime[feature]:
+                f.write(str(value) + " ")
+            f.write("\n")
         
     
 
@@ -104,7 +112,10 @@ if __name__ == "__main__":
     LUNG = True
     MELANOMA = False
     values, reports, coef, filename = get_models("LDA", BREAST, LUNG, MELANOMA)
+    print("Models retrieved")
     X, y = choose_cancers(BREAST, LUNG, MELANOMA)
-    # LIME(values, X, y)
+    lime_permutation = LIME(values, X, y)
+    print("Lime performed")
     permutation_features = feature_permutation(values, X, y)
-    save_features(filename, permutation_features, coef, BREAST, LUNG, MELANOMA)
+    print("Permutation performed")
+    save_features(filename, permutation_features, lime_permutation, coef, BREAST, LUNG, MELANOMA)

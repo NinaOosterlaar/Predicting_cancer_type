@@ -3,13 +3,13 @@ Best parameters: {'C': 0.01, 'class_weight': 'balanced', 'coef0': 0.0, 'gamma': 
 Best score: 0.9323973945487889
 
 Lung cancer Melanoma Support Vector Machine
-Best parameters: {'C': 100, 'class_weight': None, 'coef0': 0.0, 'gamma': 'scale', 'kernel': 'linear', 'shrinking': True, 'tol': 0.0001}
-Best score: 0.9328461140140283
+Best parameters: {'C': 0.01, 'class_weight': None, 'coef0': 0.0, 'gamma': 'scale', 'kernel': 'linear', 'shrinking': True, 'tol': 0.0001}
+Best score: 0.9301016805535941
 
 Breast cancer Lung cancer Support Vector Machine
 Best parameters: {'C': 0.01, 'class_weight': 'balanced', 'coef0': 0.0, 'gamma': 'scale', 'kernel': 'linear', 'shrinking': True, 'tol': 0.0001}
 Best score: 0.8823167469234885
 
 Breast cancer Lung cancer Melanoma Support Vector Machine
-Best parameters: {'C': 100, 'class_weight': 'balanced', 'coef0': 0.0, 'gamma': 'scale', 'kernel': 'linear', 'shrinking': True, 'tol': 0.01}
-Best score: 0.8675555555555554
+Best parameters: {'C': 0.01, 'class_weight': 'balanced', 'coef0': 0.0, 'gamma': 'scale', 'kernel': 'linear', 'shrinking': True, 'tol': 0.0001}
+Best score: 0.8671111111111112

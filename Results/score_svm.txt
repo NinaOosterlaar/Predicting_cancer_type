@@ -1,0 +1,31 @@
+SVM
+Breast cancer Lung cancer 
+fit_time: 0.1630101203918457
+score_time: 0.0036588668823242187
+test_accuracy: 0.8823167469234885
+test_roc_auc: 0.921483188839135
+Breast cancer: {'precision': 0.8062384451251999, 'recall': 0.9785367407053579, 'f1-score': 0.8826187521976733, 'support': 158.2}
+Lung cancer: {'precision': 0.9783178555164488, 'recall': 0.8056545353027765, 'f1-score': 0.8817138896580156, 'support': 198.6}
+SVM
+Breast cancer Melanoma 
+fit_time: 0.04515604972839356
+score_time: 0.002023172378540039
+test_accuracy: 0.9323973945487889
+test_roc_auc: 0.9341888563904235
+Breast cancer: {'precision': 0.9065391378862427, 'recall': 0.9962025316455696, 'f1-score': 0.9490620135726333, 'support': 158.2}
+Lung cancer: {'precision': 0.9920864197530864, 'recall': 0.8241134751773049, 'f1-score': 0.8994339320293985, 'support': 93.2}SVM
+Lung cancer Melanoma 
+fit_time: 0.09091396331787109
+score_time: 0.0023120880126953126
+test_accuracy: 0.9301016805535941
+test_roc_auc: 0.9859978306893735
+Breast cancer: {'precision': 0.9497814098327388, 'recall': 0.9497385919496472, 'f1-score': 0.9484629565657869, 'support': 198.6}
+Lung cancer: {'precision': 0.9038124400230734, 'recall': 0.888675360329444, 'f1-score': 0.8903922207648295, 'support': 93.2}
+SVM
+Breast cancer Lung cancer Melanoma 
+fit_time: 0.2841638565063477
+score_time: 0.0069274425506591795
+test_accuracy: 0.8671111111111112
+test_roc_auc_ovr: 0.93729591843498
+Breast cancer: {'precision': 0.7433284310997177, 'recall': 0.9760050951357376, 'f1-score': 0.8427593259443704, 'support': 158.2}
+Lung cancer: {'precision': 0.9745715762905067, 'recall': 0.8036444850515201, 'f1-score': 0.8789428309410529, 'support': 198.6}
