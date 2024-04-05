@@ -6,6 +6,7 @@ from create_data import choose_cancers
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from read_parameters import retrieve_parameters, preprocess_parameters
 from sklearn.metrics import classification_report
+import numpy as np
 
 
 
@@ -58,12 +59,12 @@ def evaluate(clf, X, y):
     return values, reports, coef
 
 
-def manage_scores(values, reports, coef):
+def manage_scores(values, reports, BREAST, LUNG, MELANOMA):
     scores = {}
     for key in values.keys():
         if key != "estimator" and key != 'indices':
             scores[key] = values[key].mean()
-    labels = conversion_labels()
+    labels = conversion_labels(BREAST, LUNG, MELANOMA)
     for report in reports:
         for key in report.keys():
             if key in labels:
@@ -71,12 +72,12 @@ def manage_scores(values, reports, coef):
                     scores[labels[key]] = {}
                 for metric in report[key].keys():
                     if metric not in scores[labels[key]]:
-                        scores[labels[key]][metric] = 0
-                    scores[labels[key]][metric] += report[key][metric]
+                        scores[labels[key]][metric] = []
+                    scores[labels[key]][metric].append(report[key][metric])
     for key in scores.keys():
         if type(scores[key]) == dict:
             for metric in scores[key].keys():
-                scores[key][metric] /= len(reports)
+                scores[key][metric] = [np.mean(scores[key][metric]), np.std(scores[key][metric])]
     return scores
 
 
