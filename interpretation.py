@@ -13,25 +13,42 @@ LIVER = False
 
 features = np.array(["A->C", "A->G", "A->T", "C->A", "C->G", "C->T", "G->A", "G->C", "G->T", "T->A", "T->C", "T->G"])
 
-def LIME(values, X, y):
-    feature_importance = {}  # Dictionary to store feature importance values
+def LIME(values, X, y, multi_class=False):
+    if multi_class:
+        feature_importance = {0: {}, 1: {}, 2: {}}  # Dictionary to store feature importance values
+    else:
+        feature_importance = {0: {}, 1: {}}
 
     for count in range(5):
         model, x_test, y_test = process_data(values, X, y, count)
         x_test = np.array(x_test)
         explainer = lime.lime_tabular.LimeTabularExplainer(x_test, mode="classification", feature_names=features)
         
+        highest_weight = 0
         for i in range(len(x_test)):
-            exp = explainer.explain_instance(x_test[i], model.predict_proba, num_features=12)
+            exp = explainer.explain_instance(x_test[i], model.predict_proba, num_features=12)  
             
             # Accumulate feature importance values
             for feature, weight in exp.as_list():
-                if feature not in feature_importance:
-                    feature_importance[feature] = []
-                feature_importance[feature].append(weight)
+                if abs(weight) > highest_weight:
+                    highest_weight = abs(weight)
+                if "G->C" in feature or "G->A" in feature or "C->T" in feature:
+                    if weight > 0:
+                        c = 1
+                    else:
+                        c = 0
+                    if feature not in feature_importance[c]:
+                        feature_importance[c][feature] = []
+                    feature_importance[c][feature].append(weight)
+        print(highest_weight)
     
     # Compute average importance values for each feature
-    avg_importance = {feature: (np.mean(values), np.std(values), len(values)) for feature, values in feature_importance.items()}
+    avg_importance = {0: {feature: (np.mean(values), np.std(values), len(values)) for feature, values in feature_importance[0].items()},
+                      1: {feature: (np.mean(values), np.std(values), len(values)) for feature, values in feature_importance[1].items()}}
+    # avg_importance = {feature: (np.mean(values), np.std(values), len(values)) for feature, values in feature_importance.items()}
+    print(avg_importance[0])
+    print("\n")
+    print(avg_importance[1])
 
     return avg_importance
             
@@ -58,22 +75,23 @@ def process_data(values, X, y, count):
     return model, x_test, y_test
 
 
-def get_models(classifier, BREAST, LUNG, MELANOMA):
+def get_models(classifier, X, y, BREAST, LUNG, MELANOMA):
     if classifier == "RandomForest":
         parameters = get_parameters("Hyperparameters/random_forest.txt", BREAST, LUNG, MELANOMA)
-        values, reports, coef = random_forest(parameters, BREAST, LUNG, MELANOMA)
+        values, reports, coef = random_forest(parameters, X, y)
         filename = "Results/features_random_forest.txt"
     elif classifier == "SVM":
         parameters = get_parameters("Hyperparameters/svm.txt", BREAST, LUNG, MELANOMA)
-        values, reports, coef = support_vector_machine(parameters, BREAST, LUNG, MELANOMA)
+        values, reports, coef = support_vector_machine(parameters, X, y)
         filename = "Results/features_svm.txt"
     elif classifier == "LDA":
         parameters = get_parameters("Hyperparameters/LDA.txt", BREAST, LUNG, MELANOMA)
-        values, reports, coef = linear_discriminant_analysis(parameters, BREAST, LUNG, MELANOMA)
+        values, reports, coef = linear_discriminant_analysis(parameters, X, y)
         filename = "Results/features_LDA.txt"
     else:
+        print("logistic")
         parameters = get_parameters("Hyperparameters/logistic_regression.txt", BREAST, LUNG, MELANOMA)
-        values, reports, coef = logistic_regression(parameters, BREAST, LUNG, MELANOMA)
+        values, reports, coef = logistic_regression(parameters, X, y)
         filename = "Results/features_logistic.txt"
     return values, reports, coef, filename
 
@@ -109,13 +127,13 @@ def save_features(filename, features_permutation, features_lime, coef, BREAST, L
 
 if __name__ == "__main__":
     BREAST = True
-    LUNG = True
-    MELANOMA = False
-    values, reports, coef, filename = get_models("LDA", BREAST, LUNG, MELANOMA)
-    print("Models retrieved")
+    LUNG = False
+    MELANOMA = True
     X, y = choose_cancers(BREAST, LUNG, MELANOMA)
-    lime_permutation = LIME(values, X, y)
+    values, reports, coef, filename = get_models("LDA", X, y, BREAST, LUNG, MELANOMA)
+    print("Models retrieved")
+    lime_permutation = LIME(values, X, y, multi_class=True)
     print("Lime performed")
-    permutation_features = feature_permutation(values, X, y)
-    print("Permutation performed")
-    save_features(filename, permutation_features, lime_permutation, coef, BREAST, LUNG, MELANOMA)
+    # permutation_features = feature_permutation(values, X, y)
+    # print("Permutation performed")
+    # save_features(filename, permutation_features, lime_permutation, coef, BREAST, LUNG, MELANOMA)
